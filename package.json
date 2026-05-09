@@ -1,0 +1,29 @@
+{
+    "name": "qubes-vscode",
+    "displayName": "QubesOS Integration",
+    "description": "Add QubesOS context menu actions to VSCode file explorer (copy/move to other qubes, open in disposable VM)",
+    "version": "0.0.1",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/thom-gdpt/qubes-vscode"
+    },
+    "engines": {
+        "vscode": "^1.118.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "qubes",
+        "qubesos"
+    ],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "devDependencies": {
+        "@types/node": "^25.x",
+        "@types/vscode": "^1.118.0",
+        "@vscode/vsce": "^3.9.1"
+    }
+}
