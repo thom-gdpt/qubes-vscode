@@ -21,6 +21,78 @@
     "activationEvents": [
         "onStartupFinished"
     ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "qubes.copyToQube",
+                "title": "Copy to other qube...",
+                "category": "Qubes"
+            },
+            {
+                "command": "qubes.moveToQube",
+                "title": "Move to other qube...",
+                "category": "Qubes"
+            },
+            {
+                "command": "qubes.editInDisposable",
+                "title": "Edit in disposable qube",
+                "category": "Qubes"
+            },
+            {
+                "command": "qubes.viewInDisposable",
+                "title": "View in disposable qube",
+                "category": "Qubes"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "qubes.copyToQube",
+                    "when": "qubes.isQubesOS",
+                    "group": "qubes@1"
+                },
+                {
+                    "command": "qubes.moveToQube",
+                    "when": "qubes.isQubesOS",
+                    "group": "qubes@1"
+                },
+                {
+                    "command": "qubes.editInDisposable",
+                    "when": "qubes.isQubesOS && !explorerResourceIsFolder",
+                    "group": "qubes@2"
+                },
+                {
+                    "command": "qubes.viewInDisposable",
+                    "when": "qubes.isQubesOS && !explorerResourceIsFolder",
+                    "group": "qubes@2"
+                }
+            ]
+        },
+        "configuration": {
+            "title": "QubesOS Integration",
+            "properties": {
+                "qubes.showNotifications": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show notification messages when operations complete"
+                },
+                "qubes.autoDetect": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically detect if running on QubesOS"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "lint": "eslint src --ext ts",
+        "pretest": "npm run compile && npm run lint",
+        "package": "vsce package"
+    },
     "devDependencies": {
         "@types/node": "^25.x",
         "@types/vscode": "^1.118.0",
