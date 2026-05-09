@@ -43,6 +43,16 @@
                 "command": "qubes.viewInDisposable",
                 "title": "View in disposable qube",
                 "category": "Qubes"
+            },
+            {
+                "command": "qubes.convertPdf",
+                "title": "Convert PDF in disposable qube",
+                "category": "Qubes"
+            },
+            {
+                "command": "qubes.convertImage",
+                "title": "Convert image in disposable qube",
+                "category": "Qubes"
             }
         ],
         "menus": {
@@ -66,6 +76,16 @@
                     "command": "qubes.viewInDisposable",
                     "when": "qubes.isQubesOS && !explorerResourceIsFolder",
                     "group": "qubes@2"
+                },
+                {
+                    "command": "qubes.convertPdf",
+                    "when": "qubes.isQubesOS && !explorerResourceIsFolder && resourceExtname == .pdf",
+                    "group": "qubes@3"
+                },
+                {
+                    "command": "qubes.convertImage",
+                    "when": "qubes.isQubesOS && !explorerResourceIsFolder && (resourceExtname == .png || resourceExtname == .jpg || resourceExtname == .jpeg || resourceExtname == .gif || resourceExtname == .bmp || resourceExtname == .tiff || resourceExtname == .tif || resourceExtname == .webp || resourceExtname == .svg)",
+                    "group": "qubes@3"
                 }
             ]
         },

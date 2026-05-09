@@ -12,6 +12,8 @@ const QUBES_COMMANDS = {
     COPY_TO_VM: '/usr/lib/qubes/qvm-copy-to-vm.gnome',
     MOVE_TO_VM: '/usr/lib/qubes/qvm-move-to-vm.gnome',
     OPEN_IN_DVM: '/usr/bin/qvm-open-in-dvm',
+    CONVERT_PDF: '/usr/lib/qubes/qvm-convert-pdf.gnome',
+    CONVERT_IMG: '/usr/lib/qubes/qvm-convert-img.gnome',
 } as const;
 
 /**
@@ -38,6 +40,28 @@ interface QubesOperationContext {
 interface PathValidationResult {
     valid: string[];
     invalid: string[];
+}
+
+/**
+ * Image file extensions supported for conversion
+ */
+const IMAGE_EXTENSIONS = [
+    '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff', '.tif', '.webp', '.svg'
+] as const;
+
+/**
+ * Check if a file is a PDF
+ */
+function isPdfFile(filePath: string): boolean {
+    return filePath.toLowerCase().endsWith('.pdf');
+}
+
+/**
+ * Check if a file is an image
+ */
+function isImageFile(filePath: string): boolean {
+    const lowerPath = filePath.toLowerCase();
+    return IMAGE_EXTENSIONS.some(ext => lowerPath.endsWith(ext));
 }
 
 /**
@@ -219,6 +243,84 @@ async function openInDisposable(uri: vscode.Uri, viewOnly: boolean = false): Pro
 }
 
 /**
+ * Handle PDF conversion in disposable VM
+ */
+async function convertPdf(uri: vscode.Uri, uris?: vscode.Uri[]): Promise<void> {
+    const files = uris && uris.length > 0 ? uris : [uri];
+    const paths = files.map(f => f.fsPath);
+
+    // Validate paths and filter for PDFs only
+    const { valid, invalid } = validatePaths(paths);
+    const pdfFiles = valid.filter(isPdfFile);
+    const nonPdfCount = valid.length - pdfFiles.length;
+
+    if (invalid.length > 0) {
+        vscode.window.showWarningMessage(
+            `${invalid.length} file(s) no longer exist and will be skipped`
+        );
+    }
+
+    if (nonPdfCount > 0) {
+        vscode.window.showWarningMessage(
+            `${nonPdfCount} non-PDF file(s) will be skipped`
+        );
+    }
+
+    if (pdfFiles.length === 0) {
+        vscode.window.showErrorMessage('No valid PDF files to convert');
+        return;
+    }
+
+    // Process files one at a time (as per official implementation)
+    for (const pdfFile of pdfFiles) {
+        await executeQubesCommand(
+            QUBES_COMMANDS.CONVERT_PDF,
+            [pdfFile],
+            { operation: 'Convert PDF in disposable qube', fileCount: 1 }
+        );
+    }
+}
+
+/**
+ * Handle image conversion in disposable VM
+ */
+async function convertImage(uri: vscode.Uri, uris?: vscode.Uri[]): Promise<void> {
+    const files = uris && uris.length > 0 ? uris : [uri];
+    const paths = files.map(f => f.fsPath);
+
+    // Validate paths and filter for images only
+    const { valid, invalid } = validatePaths(paths);
+    const imageFiles = valid.filter(isImageFile);
+    const nonImageCount = valid.length - imageFiles.length;
+
+    if (invalid.length > 0) {
+        vscode.window.showWarningMessage(
+            `${invalid.length} file(s) no longer exist and will be skipped`
+        );
+    }
+
+    if (nonImageCount > 0) {
+        vscode.window.showWarningMessage(
+            `${nonImageCount} non-image file(s) will be skipped`
+        );
+    }
+
+    if (imageFiles.length === 0) {
+        vscode.window.showErrorMessage('No valid image files to convert');
+        return;
+    }
+
+    // Process files one at a time (as per official implementation)
+    for (const imageFile of imageFiles) {
+        await executeQubesCommand(
+            QUBES_COMMANDS.CONVERT_IMG,
+            [imageFile],
+            { operation: 'Convert image in disposable qube', fileCount: 1 }
+        );
+    }
+}
+
+/**
  * Extension activation
  */
 export async function activate(context: vscode.ExtensionContext) {
@@ -275,6 +377,26 @@ export async function activate(context: vscode.ExtensionContext) {
                 await openInDisposable(uri, true);
             } catch (error) {
                 console.error('View in disposable failed:', error);
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('qubes.convertPdf', async (uri: vscode.Uri, uris?: vscode.Uri[]) => {
+            try {
+                await convertPdf(uri, uris);
+            } catch (error) {
+                console.error('Convert PDF failed:', error);
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('qubes.convertImage', async (uri: vscode.Uri, uris?: vscode.Uri[]) => {
+            try {
+                await convertImage(uri, uris);
+            } catch (error) {
+                console.error('Convert image failed:', error);
             }
         })
     );
