@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Compiled output
+out/
+*.js
+*.js.map
+dist/
+
+# Built extension package
+*.vsix
+
+# IDE & Editor
+.vscode/
+.vscode-test/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+tsconfig.tsbuildinfo
+
+# Logs
+npm-debug.log*
+*.log
