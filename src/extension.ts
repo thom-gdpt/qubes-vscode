@@ -52,14 +52,14 @@ const IMAGE_EXTENSIONS = [
 /**
  * Check if a file is a PDF
  */
-function isPdfFile(filePath: string): boolean {
+export function isPdfFile(filePath: string): boolean {
     return filePath.toLowerCase().endsWith('.pdf');
 }
 
 /**
  * Check if a file is an image
  */
-function isImageFile(filePath: string): boolean {
+export function isImageFile(filePath: string): boolean {
     const lowerPath = filePath.toLowerCase();
     return IMAGE_EXTENSIONS.some(ext => lowerPath.endsWith(ext));
 }
@@ -85,7 +85,7 @@ async function isQubesOS(): Promise<boolean> {
 /**
  * Escape shell arguments to prevent command injection
  */
-function escapeShellArg(arg: string): string {
+export function escapeShellArg(arg: string): string {
     // Use single quotes and escape any single quotes in the string
     return `'${arg.replace(/'/g, "'\\''")}'`;
 }
@@ -93,7 +93,7 @@ function escapeShellArg(arg: string): string {
 /**
  * Validate that paths exist and are accessible
  */
-function validatePaths(paths: string[]): PathValidationResult {
+export function validatePaths(paths: string[]): PathValidationResult {
     const valid: string[] = [];
     const invalid: string[] = [];
 
