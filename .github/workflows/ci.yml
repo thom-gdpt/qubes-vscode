@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  release:
+    types:
+      - created
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Compile TypeScript
+        run: npm run compile
+
+      - name: Run tests (Linux)
+        run: xvfb-run -a npm test
+        if: runner.os == 'Linux'
+
+      - name: Run tests (macOS/Windows)
+        run: npm test
+        if: runner.os != 'Linux'
+
+  package:
+    needs: test
+    if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Package extension
+        run: npm run package
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qubes-os-vscode-${{ github.ref_name }}.vsix
+          path: "*.vsix"
+
+  publish-vscode-marketplace:
+    needs: package
+    if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name == 'release' && secrets.VSCE_PAT != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to Visual Studio Marketplace
+        run: npx vsce publish -p ${{ secrets.VSCE_PAT }}
+
+  publish-open-vsx:
+    needs: package
+    if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name == 'release' && secrets.OVSX_TOKEN != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to Open VSX Registry
+        run: npx ovsx publish -p ${{ secrets.OVSX_TOKEN }}
