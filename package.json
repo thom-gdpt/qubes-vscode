@@ -1,6 +1,6 @@
 {
     "name": "qubes-vscode",
-    "displayName": "QubesOS Integration",
+    "displayName": "QubesOS Integration (unofficial)",
     "description": "Add QubesOS context menu actions to VSCode file explorer (copy/move to other qubes, open in disposable VM)",
     "version": "0.0.1",
     "license": "MIT",
