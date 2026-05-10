@@ -75,8 +75,9 @@ jobs:
 
   publish-vscode-marketplace:
     needs: package
-    if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name == 'release' && secrets.VSCE_PAT != ''
+    if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name == 'release'
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -95,8 +96,9 @@ jobs:
 
   publish-open-vsx:
     needs: package
-    if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name == 'release' && secrets.OVSX_TOKEN != ''
+    if: success() && startsWith(github.ref, 'refs/tags/') && github.event_name == 'release'
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
