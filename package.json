@@ -21,6 +21,7 @@
     "activationEvents": [
         "onStartupFinished"
     ],
+    "icon": "images/qubes-logo-icon.png",
     "main": "./out/extension.js",
     "contributes": {
         "commands": [
