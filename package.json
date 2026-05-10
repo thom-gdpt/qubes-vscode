@@ -2,7 +2,7 @@
     "name": "qubes-vscode",
     "displayName": "QubesOS Integration (unofficial)",
     "description": "Add QubesOS context menu actions to VSCode file explorer",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": "MIT",
     "publisher": "thomasgtdp",
     "repository": {
